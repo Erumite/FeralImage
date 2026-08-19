@@ -69,7 +69,7 @@ body.feral-image-mode > img:not(#feral-image-element) {
   image-rendering: -webkit-optimize-contrast !important;
 }
 
-/* Compact HUD Overlay - Anchored flush in top-right corner, non-rounded top-right edge */
+/* Compact HUD Overlay - Anchored flush in top-right corner */
 #feral-image-hud {
   position: fixed !important;
   top: 0 !important;
@@ -112,6 +112,7 @@ body.feral-image-mode > img:not(#feral-image-element) {
 #feral-image-hud:hover {
   opacity: 1 !important;
   transform: translateY(0) !important;
+  pointer-events: auto !important;
 }
 
 .feral-hud-badge {

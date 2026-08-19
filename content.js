@@ -8,7 +8,7 @@
  * - Shift + Left/Right Arrow rotation (90° steps)
  * - Click and drag panning locked to screen edges (10px margin constraint)
  * - Double-click toggle (Fit vs 1:1 actual size)
- * - Ultra-compact HUD overlay showing ONLY during zoom or rotation (auto-hides after 1 second)
+ * - Ultra-compact HUD overlay showing ONLY during zoom or rotation (auto-hides after 1 second of inactivity, stays visible while mouse hovers over HUD)
  * - MutationObserver & Polling for instant detection of Chromium async data:image <img> tags
  */
 
@@ -38,6 +38,7 @@
   let initialTranslateY = 0;
 
   let hudTimeout = null;
+  let isHoveringHUD = false;
 
   /**
    * Check if current tab is a standalone image tab or direct base64 data:image/... URI
@@ -186,15 +187,20 @@
   }
 
   /**
-   * Show HUD ONLY on zoom or rotation activity; auto-hide after 1 second (1000ms)
+   * Show HUD ONLY on zoom or rotation activity; auto-hide after 1 second (1000ms) unless mouse hovers over HUD
    */
   function triggerHUD() {
     if (!hudEl) return;
     hudEl.classList.remove('hud-hidden');
     clearTimeout(hudTimeout);
-    hudTimeout = setTimeout(() => {
-      hudEl.classList.add('hud-hidden');
-    }, 1000);
+
+    if (!isHoveringHUD) {
+      hudTimeout = setTimeout(() => {
+        if (!isHoveringHUD) {
+          hudEl.classList.add('hud-hidden');
+        }
+      }, 1000);
+    }
   }
 
   /**
@@ -400,6 +406,23 @@
     hudEl = document.createElement('div');
     hudEl.id = 'feral-image-hud';
     hudEl.className = 'hud-hidden';
+
+    // Prevent auto-hiding while mouse hovers over HUD
+    hudEl.addEventListener('mouseenter', () => {
+      isHoveringHUD = true;
+      hudEl.classList.remove('hud-hidden');
+      clearTimeout(hudTimeout);
+    });
+
+    hudEl.addEventListener('mouseleave', () => {
+      isHoveringHUD = false;
+      clearTimeout(hudTimeout);
+      hudTimeout = setTimeout(() => {
+        if (!isHoveringHUD) {
+          hudEl.classList.add('hud-hidden');
+        }
+      }, 1000);
+    });
 
     hudInfoEl = document.createElement('span');
     hudInfoEl.className = 'feral-hud-badge';
