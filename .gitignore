@@ -1,0 +1,11 @@
+# Operating System Files
+.DS_Store
+Thumbs.db
+
+# Temporary / Log files
+*.log
+.idea/
+.vscode/
+
+# Zip artifacts
+*.zip

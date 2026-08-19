@@ -1,0 +1,174 @@
+/* FeralImages - Standalone Image Viewer Styles */
+
+html.feral-image-mode,
+body.feral-image-mode {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  overflow: hidden !important;
+  background-color: #000000 !important;
+  background-image: none !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+}
+
+/* Hide any chrome original elements when active */
+body.feral-image-mode > img:not(#feral-image-element) {
+  display: none !important;
+}
+
+#feral-image-viewport {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  overflow: hidden !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 2147483640 !important;
+  cursor: grab !important;
+  touch-action: none !important;
+  background-color: #000000 !important;
+}
+
+#feral-image-viewport.is-dragging {
+  cursor: grabbing !important;
+}
+
+#feral-image-stage {
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform-origin: center center !important;
+  will-change: transform !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: transform 0.05s ease-out;
+}
+
+#feral-image-stage.animated {
+  transition: transform 0.25s cubic-bezier(0.2, 0, 0.2, 1) !important;
+}
+
+#feral-image-element {
+  display: block !important;
+  max-width: none !important;
+  max-height: none !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6) !important;
+  border-radius: 2px !important;
+  pointer-events: none !important;
+  image-rendering: -webkit-optimize-contrast !important;
+}
+
+/* Compact HUD Overlay - Anchored flush in top-right corner, non-rounded top-right edge */
+#feral-image-hud {
+  position: fixed !important;
+  top: 0 !important;
+  right: 0 !important;
+  bottom: auto !important;
+  left: auto !important;
+  transform: translateY(0) !important;
+  background: rgba(18, 18, 22, 0.88) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border-left: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-top: none !important;
+  border-right: none !important;
+  border-top-right-radius: 0 !important;
+  border-top-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+  border-bottom-left-radius: 12px !important;
+  padding: 4px 10px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  z-index: 2147483647 !important;
+  box-shadow: -2px 4px 16px rgba(0, 0, 0, 0.4) !important;
+  color: #f0f0f5 !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.2px !important;
+  opacity: 1 !important;
+  transition: opacity 0.2s ease, transform 0.2s ease !important;
+  pointer-events: auto !important;
+}
+
+#feral-image-hud.hud-hidden {
+  opacity: 0 !important;
+  transform: translateY(-8px) !important;
+  pointer-events: none !important;
+}
+
+#feral-image-hud:hover {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+}
+
+.feral-hud-badge {
+  background: rgba(255, 255, 255, 0.1) !important;
+  padding: 2px 6px !important;
+  border-radius: 10px !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+  font-size: 11px !important;
+  color: #38bdf8 !important;
+}
+
+.feral-hud-divider {
+  width: 1px !important;
+  height: 12px !important;
+  background: rgba(255, 255, 255, 0.15) !important;
+}
+
+.feral-hud-controls {
+  display: flex !important;
+  align-items: center !important;
+  gap: 3px !important;
+}
+
+.feral-hud-btn {
+  background: transparent !important;
+  border: none !important;
+  color: #cbd5e1 !important;
+  width: 22px !important;
+  height: 22px !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  font-size: 11px !important;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease !important;
+}
+
+.feral-hud-btn:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+  color: #ffffff !important;
+}
+
+.feral-hud-btn:active {
+  transform: scale(0.92) !important;
+}
+
+.feral-hud-hints {
+  font-size: 10px !important;
+  color: rgba(255, 255, 255, 0.4) !important;
+  margin-left: 2px !important;
+}
+
+.feral-key-badge {
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: #fff !important;
+  padding: 1px 4px !important;
+  border-radius: 3px !important;
+  font-size: 9px !important;
+}
