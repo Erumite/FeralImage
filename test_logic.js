@@ -49,5 +49,66 @@ function clampTranslation(translateX, translateY, scale, rotation, imgW, imgH, v
 console.log('Testing clampTranslation when dragging down (large image)...');
 const res1 = clampTranslation(0, 800, 1, 0, 2000, 2000, 1000, 1000, 10);
 assert.strictEqual(res1.clampedY, 510);
+console.log('✓ Clamping logic verified!');
+
+// 3. Test getImageDimensions fallback handling (SVGs and unrendered tags)
+function getImageDimensions(img) {
+  if (!img) return { width: 800, height: 600 };
+  let w = img.naturalWidth || img.clientWidth || 0;
+  let h = img.naturalHeight || img.clientHeight || 0;
+
+  if (!w || !h) {
+    const rect = typeof img.getBoundingClientRect === 'function' ? img.getBoundingClientRect() : null;
+    if (rect) {
+      w = w || rect.width;
+      h = h || rect.height;
+    }
+  }
+
+  if (!w || !h) {
+    const attrW = parseFloat(img.getAttribute ? img.getAttribute('width') : null);
+    const attrH = parseFloat(img.getAttribute ? img.getAttribute('height') : null);
+    if (attrW && attrH) {
+      w = w || attrW;
+      h = h || attrH;
+    }
+  }
+
+  return {
+    width: w || 800,
+    height: h || 600
+  };
+}
+
+console.log('Testing getImageDimensions attribute and bounding box fallbacks...');
+const mockSvgImg = {
+  naturalWidth: 0,
+  naturalHeight: 0,
+  clientWidth: 0,
+  clientHeight: 0,
+  getBoundingClientRect: () => ({ width: 400, height: 300 }),
+  getAttribute: (attr) => (attr === 'width' ? '400' : attr === 'height' ? '300' : null)
+};
+const dims = getImageDimensions(mockSvgImg);
+assert.strictEqual(dims.width, 400);
+assert.strictEqual(dims.height, 300);
+console.log('✓ SVG dimension fallbacks verified!');
+
+// 4. Test isDefinitelyRegularPage early exit heuristic
+function isDefinitelyRegularPage(bodyChildren) {
+  const nonImgChildren = bodyChildren.filter(
+    (el) => el.tagName !== 'IMG' && el.tagName !== 'SCRIPT' && el.tagName !== 'STYLE' && el.id !== 'feral-image-viewport'
+  );
+  return nonImgChildren.length > 0;
+}
+
+console.log('Testing isDefinitelyRegularPage on standard HTML page body...');
+const mockRegularBodyChildren = [
+  { tagName: 'DIV', id: 'app' },
+  { tagName: 'NAV', id: 'navbar' },
+  { tagName: 'IMG', src: 'logo.png' }
+];
+assert.strictEqual(isDefinitelyRegularPage(mockRegularBodyChildren), true);
+console.log('✓ Regular web page early exit heuristic verified!');
 
 console.log('\nAll tests passed cleanly!');

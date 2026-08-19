@@ -52,7 +52,9 @@ if (chrome.webNavigation) {
 // 2. Tab updates & active tab listeners
 if (chrome.tabs) {
   chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-    injectViewer(tabId, changeInfo.url || tab.url);
+    if (changeInfo.url || changeInfo.status === 'loading') {
+      injectViewer(tabId, changeInfo.url || tab.url);
+    }
   });
 
   chrome.tabs.onActivated.addListener((activeInfo) => {

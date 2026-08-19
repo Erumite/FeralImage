@@ -108,13 +108,43 @@
   }
 
   /**
+   * Robustly retrieve image natural or rendered dimensions, including fallback checks for SVGs and unrendered tags
+   */
+  function getImageDimensions(img) {
+    if (!img) return { width: 800, height: 600 };
+    let w = img.naturalWidth || img.clientWidth || 0;
+    let h = img.naturalHeight || img.clientHeight || 0;
+
+    if (!w || !h) {
+      const rect = typeof img.getBoundingClientRect === 'function' ? img.getBoundingClientRect() : null;
+      if (rect) {
+        w = w || rect.width;
+        h = h || rect.height;
+      }
+    }
+
+    if (!w || !h) {
+      const attrW = parseFloat(img.getAttribute('width'));
+      const attrH = parseFloat(img.getAttribute('height'));
+      if (attrW && attrH) {
+        w = w || attrW;
+        h = h || attrH;
+      }
+    }
+
+    return {
+      width: w || 800,
+      height: h || 600
+    };
+  }
+
+  /**
    * Compute the scale required to fit image cleanly into viewport
    */
   function calculateFitScale() {
     if (!imgElement) return 1.0;
 
-    const naturalW = imgElement.naturalWidth || imgElement.clientWidth || 800;
-    const naturalH = imgElement.naturalHeight || imgElement.clientHeight || 600;
+    const { width: naturalW, height: naturalH } = getImageDimensions(imgElement);
 
     const { boundWidth, boundHeight } = getRotatedBounds(naturalW, naturalH, rotation);
 
@@ -132,8 +162,7 @@
   function clampTranslation() {
     if (!imgElement) return;
 
-    const naturalW = imgElement.naturalWidth || imgElement.clientWidth || 800;
-    const naturalH = imgElement.naturalHeight || imgElement.clientHeight || 600;
+    const { width: naturalW, height: naturalH } = getImageDimensions(imgElement);
 
     const { boundWidth, boundHeight } = getRotatedBounds(naturalW, naturalH, rotation);
 
@@ -506,6 +535,19 @@
   }
 
   /**
+   * Helper check to detect standard web pages early and prevent unnecessary MutationObserver/polling overhead
+   */
+  function isDefinitelyRegularPage() {
+    const body = document.body;
+    if (!body) return false;
+
+    const nonImgChildren = Array.from(body.children).filter(
+      (el) => el.tagName !== 'IMG' && el.tagName !== 'SCRIPT' && el.tagName !== 'STYLE' && el.id !== 'feral-image-viewport'
+    );
+    return nonImgChildren.length > 0;
+  }
+
+  /**
    * Main initialization with MutationObserver & Polling to catch async Chromium image tag creation
    */
   function init() {
@@ -521,12 +563,15 @@
           if (observer) observer.disconnect();
           if (pollTimer) clearInterval(pollTimer);
         }
+      } else if (isDefinitelyRegularPage()) {
+        if (observer) observer.disconnect();
+        if (pollTimer) clearInterval(pollTimer);
       }
     }
 
     // 1. Immediate attempt
     attemptMount();
-    if (initialized) return;
+    if (initialized || isDefinitelyRegularPage()) return;
 
     // 2. MutationObserver to catch <img> tag injection instantly
     observer = new MutationObserver(() => {
