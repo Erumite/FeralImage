@@ -1,7 +1,7 @@
-# FeralImages 👁️
+# FeralImage 👁️
 > A smart, sleek browser extension for Brave & Chrome to enhance standalone image viewing.
 
-When you open an image directly in a browser tab—whether via direct URL (`.png`, `.jpg`, `.webp`, `.svg`), local file (`file://`), or base64 data URI (`data:image/...`)—**FeralImages** automatically maximizes and fits the image to your viewport, provides butter-smooth cursor-anchored zooming, edge-locked panning, and instant 90° rotation shortcuts.
+When you open an image directly in a browser tab—whether via direct URL (`.png`, `.jpg`, `.webp`, `.svg`), local file (`file://`), or base64 data URI (`data:image/...`)—**FeralImage** automatically maximizes and fits the image to your viewport, provides butter-smooth cursor-anchored zooming, edge-locked panning, and instant 90° rotation shortcuts.
 
 ---
 
@@ -10,7 +10,7 @@ When you open an image directly in a browser tab—whether via direct URL (`.png
 - **Auto Fit to Screen**:
   Automatically scales images upon load to maximize space within your browser viewport while maintaining original aspect ratio.
 - **Cursor-Centered Mouse Wheel Zoom**:
-  Scroll up to zoom in, scroll down to zoom out. Zooming is anchored precisely under your mouse cursor for intuitive navigation.
+  Scroll up to zoom in, scroll down to zoom out. Zooming is anchored under your mouse cursor.
 - **Shift + Arrow Key Rotation**:
   - **`Shift` + `←` (Left Arrow)**: Rotates image 90° counter-clockwise (-90°).
   - **`Shift` + `→` (Right Arrow)**: Rotates image 90° clockwise (+90°).
@@ -18,10 +18,6 @@ When you open an image directly in a browser tab—whether via direct URL (`.png
   Click and drag with left mouse button to pan around zoomed images. Edges are locked to a 10px screen threshold so images never get lost off-screen.
 - **Double-Click Toggle**:
   Double-click anywhere to toggle between **Fit to Screen** and **100% Actual Size (1:1)**.
-- **Solid Black Background**:
-  Clean, distraction-free pure black background (`#000000`).
-- **Flush Top-Right HUD**:
-  Minimalist overlay anchored flush in the top-right corner displaying live zoom percentage (e.g., `125%`) and rotation angle (e.g., `90°`). Only appears during zoom or rotation activity and auto-hides after 1 second.
 - **Base64 & Data URI Support**:
   Full support for top-level `data:image/png;base64,...`, `data:image/jpeg;base64,...`, and `data:image/svg+xml;...` URIs.
 
@@ -32,9 +28,9 @@ When you open an image directly in a browser tab—whether via direct URL (`.png
 1. Open **Brave** (`brave://extensions`) or **Chrome** (`chrome://extensions`).
 2. Enable **Developer mode** (toggle in the top-right corner).
 3. Click **Load unpacked** (top-left button).
-4. Select the **FeralImages** project directory.
+4. Select the **FeralImage** project directory.
 
-> **Note for Local File URLs**: If you want to use the extension on local `file://` images, click **Details** on the FeralImages card in `brave://extensions` and enable **Allow access to file URLs**.
+> **Note for Local File URLs**: If you want to use the extension on local `file://` images, click **Details** on the FeralImage card in `brave://extensions` and enable **Allow access to file URLs**.
 
 ---
 
@@ -56,7 +52,7 @@ When you open an image directly in a browser tab—whether via direct URL (`.png
 ## 📁 Repository Structure
 
 ```text
-FeralImages/
+FeralImage/
 ├── .github/workflows/
 │   └── build-and-release.yml  # GitHub Actions CI/CD workflow
 ├── .gitignore                 # Excludes temporary build files & logs
