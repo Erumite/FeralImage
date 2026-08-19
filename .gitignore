@@ -2,8 +2,9 @@
 .DS_Store
 Thumbs.db
 
-# Temporary / Log files
+# Temporary / Log / Python files
 *.log
+*.py
 .idea/
 .vscode/
 
