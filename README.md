@@ -1,7 +1,7 @@
 # FeralImage 👁️
 > A smart, sleek browser extension for Brave & Chrome to enhance standalone image viewing.
 
-When you open an image directly in a browser tab—whether via direct URL (`.png`, `.jpg`, `.webp`, `.svg`), local file (`file://`), or base64 data URI (`data:image/...`)—**FeralImage** automatically maximizes and fits the image to your viewport, provides butter-smooth cursor-anchored zooming, edge-locked panning, and instant 90° rotation shortcuts.
+When you open an image directly in a browser tab—whether via direct URL (`.png`, `.jpg`, `.webp`, `.svg`), local file (`file://`), or base64 data URI (`data:image/...`) — **FeralImage** automatically maximizes and fits the image to your viewport, provides butter-smooth cursor-anchored zooming, edge-locked panning, and instant 90° rotation shortcuts.
 
 ---
 
@@ -25,10 +25,23 @@ When you open an image directly in a browser tab—whether via direct URL (`.png
 
 ## 🚀 Installation
 
-1. Open **Brave** (`brave://extensions`) or **Chrome** (`chrome://extensions`).
-2. Enable **Developer mode** (toggle in the top-right corner).
-3. Click **Load unpacked** (top-left button).
-4. Select the **FeralImage** project directory.
+### Option A: From GitHub Releases (Recommended)
+
+1. Download the latest `feral-images-extension.zip` from [GitHub Releases](https://github.com/Erumite/FeralImage/releases).
+2. Extract the ZIP file into a folder on your computer.
+3. Open **Brave** (`brave://extensions`) or **Chrome** (`chrome://extensions`).
+4. Enable **Developer mode** (toggle in the top-right corner).
+5. Click **Load unpacked** (top-left button) and select the extracted folder.
+
+### Option B: From Source Code
+
+1. Clone the repository:
+   ```bash
+   git clone git@github.com:Erumite/FeralImage.git
+   ```
+2. Open **Brave** (`brave://extensions`) or **Chrome** (`chrome://extensions`).
+3. Enable **Developer mode** (toggle in the top-right corner).
+4. Click **Load unpacked** and select the cloned `FeralImage` folder.
 
 > **Note for Local File URLs**: If you want to use the extension on local `file://` images, click **Details** on the FeralImage card in `brave://extensions` and enable **Allow access to file URLs**.
 
