@@ -62,6 +62,20 @@ When you open an image directly in a browser tab—whether via direct URL (`.png
 
 ---
 
+## 🔒 Permissions & Security
+
+FeralImage requests only the minimal set of permissions required to detect and enhance standalone image tabs:
+
+| Permission | Type | Why It Is Needed |
+| :--- | :--- | :--- |
+| **`<all_urls>`** | Host Permission | Allows content script injection on standalone image tabs across web pages (`http://`, `https://`), local files (`file://`), and base64 URIs (`data:image/...`). |
+| **`scripting`** | Extension Permission | Used by the background service worker (`background.js`) to programmatically inject the viewer into top-level base64 `data:image/...` tabs that bypass standard declarative match rules in Chromium. |
+| **`webNavigation`** | Extension Permission | Listens for navigation events (`onCommitted`, `onDOMContentLoaded`) to detect when a tab opens a direct image or base64 data URI instantly. |
+| **`tabs`** | Extension Permission | Inspects tab URLs on update and activation to determine if the active tab contains a standalone image or data URI that requires viewer injection. |
+| **`Allow access to file URLs`** | Optional Setting | Enabled manually by the user in `brave://extensions` to allow viewing local offline image files (`file:///...`). |
+
+---
+
 ## 📁 Repository Structure
 
 ```text
