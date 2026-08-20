@@ -65,7 +65,9 @@ body.feral-image-mode > img:not(#feral-image-element) {
   padding: 0 !important;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6) !important;
   border-radius: 2px !important;
-  pointer-events: none !important;
+  pointer-events: auto !important;
+  -webkit-user-drag: none !important;
+  user-drag: none !important;
   image-rendering: -webkit-optimize-contrast !important;
 }
 

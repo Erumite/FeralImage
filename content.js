@@ -427,6 +427,7 @@
     imgElement = document.createElement('img');
     imgElement.id = 'feral-image-element';
     imgElement.src = imageSrc;
+    imgElement.addEventListener('dragstart', (e) => e.preventDefault());
 
     stageEl.appendChild(imgElement);
     viewportEl.appendChild(stageEl);
