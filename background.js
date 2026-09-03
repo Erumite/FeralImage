@@ -61,3 +61,33 @@ if (chrome.tabs) {
     injectViewer(activeInfo.tabId, null);
   });
 }
+
+// 3. Context menu setup & click listener for "Open image in this tab"
+function setupContextMenu() {
+  if (typeof chrome !== 'undefined' && chrome.contextMenus) {
+    chrome.contextMenus.removeAll(() => {
+      chrome.contextMenus.create({
+        id: 'openImageInThisTab',
+        title: 'Open image in this tab',
+        contexts: ['image']
+      });
+    });
+  }
+}
+
+if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.onInstalled) {
+  chrome.runtime.onInstalled.addListener(() => {
+    setupContextMenu();
+  });
+}
+
+setupContextMenu();
+
+if (typeof chrome !== 'undefined' && chrome.contextMenus && chrome.contextMenus.onClicked) {
+  chrome.contextMenus.onClicked.addListener((info, tab) => {
+    if (info && info.menuItemId === 'openImageInThisTab' && info.srcUrl && tab && tab.id) {
+      chrome.tabs.update(tab.id, { url: info.srcUrl });
+    }
+  });
+}
+

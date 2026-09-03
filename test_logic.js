@@ -111,4 +111,33 @@ const mockRegularBodyChildren = [
 assert.strictEqual(isDefinitelyRegularPage(mockRegularBodyChildren), true);
 console.log('✓ Regular web page early exit heuristic verified!');
 
+// 5. Test context menu handler logic
+function handleContextMenuClick(info, tab, updateFn) {
+  if (info && info.menuItemId === 'openImageInThisTab' && info.srcUrl && tab && tab.id) {
+    updateFn(tab.id, { url: info.srcUrl });
+    return true;
+  }
+  return false;
+}
+
+console.log('Testing context menu click handler...');
+let updatedTabId = null;
+let updatedUrl = null;
+const mockUpdate = (id, options) => {
+  updatedTabId = id;
+  updatedUrl = options.url;
+};
+
+const resContextMenu = handleContextMenuClick(
+  { menuItemId: 'openImageInThisTab', srcUrl: 'https://example.com/photo.jpg' },
+  { id: 101 },
+  mockUpdate
+);
+
+assert.strictEqual(resContextMenu, true);
+assert.strictEqual(updatedTabId, 101);
+assert.strictEqual(updatedUrl, 'https://example.com/photo.jpg');
+console.log('✓ Context menu click handler verified!');
+
 console.log('\nAll tests passed cleanly!');
+

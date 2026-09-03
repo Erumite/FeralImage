@@ -18,6 +18,8 @@ When you open an image directly in a browser tab—whether via direct URL (`.png
   Click and drag with left mouse button to pan around zoomed images. Edges are locked to a 10px screen threshold so images never get lost off-screen.
 - **Double-Click Toggle**:
   Double-click anywhere to toggle between **Fit to Screen** and **100% Actual Size (1:1)**.
+- **Open Image in This Tab Context Menu**:
+  Right-click any image on a web page and select **"Open image in this tab"** to open the image directly in the current tab instead of opening a new tab.
 - **Base64 & Data URI Support**:
   Full support for top-level `data:image/png;base64,...`, `data:image/jpeg;base64,...`, and `data:image/svg+xml;...` URIs.
 
@@ -59,6 +61,7 @@ When you open an image directly in a browser tab—whether via direct URL (`.png
 | **`R` / `0`** | Reset zoom, position, and rotation |
 | **`F`** | Fit image to screen |
 | **`1`** | Set to 1:1 actual native image size |
+| **Right-click Image** | Select **"Open image in this tab"** to navigate current tab to image |
 
 ---
 
@@ -72,6 +75,7 @@ FeralImage requests only the minimal set of permissions required to detect and e
 | **`scripting`** | Extension Permission | Used by the background service worker (`background.js`) to programmatically inject the viewer into top-level base64 `data:image/...` tabs that bypass standard declarative match rules in Chromium. |
 | **`webNavigation`** | Extension Permission | Listens for navigation events (`onCommitted`, `onDOMContentLoaded`) to detect when a tab opens a direct image or base64 data URI instantly. |
 | **`tabs`** | Extension Permission | Inspects tab URLs on update and activation to determine if the active tab contains a standalone image or data URI that requires viewer injection. |
+| **`contextMenus`** | Extension Permission | Adds the **"Open image in this tab"** right-click context menu option when right-clicking images on web pages. |
 | **`Allow access to file URLs`** | Optional Setting | Enabled manually by the user in `brave://extensions` to allow viewing local offline image files (`file:///...`). |
 
 ---
