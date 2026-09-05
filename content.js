@@ -52,25 +52,37 @@
       return true;
     }
 
-    // 2. ContentType check
+    // 2. ContentType check for native Chromium image documents
     if (document.contentType && document.contentType.toLowerCase().startsWith('image/')) {
       return true;
     }
 
-    // 3. Document body inspection matching standard Chromium standalone image DOM
+    // Standard HTML pages (text/html) or URLs that are not data:image URIs
+    // must NOT evaluate DOM heuristics while document.readyState === 'loading'
+    // to prevent premature matching during incremental HTML stream parsing.
+    if (document.readyState === 'loading') {
+      return false;
+    }
+
     const body = document.body;
-    if (body) {
-      const imgs = body.getElementsByTagName('img');
-      if (imgs.length === 1) {
-        const imgSrc = (imgs[0].src || '').toLowerCase();
-        // If single image in body and either empty inner text or data image
-        if (imgSrc.startsWith('data:image') || imgs[0].parentNode === body) {
-          const nonImgChildren = Array.from(body.children).filter(
-            (el) => el.tagName !== 'IMG' && el.tagName !== 'SCRIPT' && el.tagName !== 'STYLE' && el.id !== 'feral-image-viewport'
-          );
-          if (nonImgChildren.length === 0) {
-            return true;
-          }
+    if (!body) return false;
+
+    // If body contains any visible text content, it is a regular webpage, not a standalone image tab
+    if (body.innerText && body.innerText.trim().length > 0) {
+      return false;
+    }
+
+    // 3. Document body inspection matching standard Chromium standalone image DOM
+    const imgs = body.getElementsByTagName('img');
+    if (imgs.length === 1) {
+      const imgSrc = (imgs[0].src || '').toLowerCase();
+      // If single image in body and either empty inner text or data image
+      if (imgSrc.startsWith('data:image') || imgs[0].parentNode === body) {
+        const nonImgChildren = Array.from(body.children).filter(
+          (el) => el.tagName !== 'IMG' && el.tagName !== 'SCRIPT' && el.tagName !== 'STYLE' && el.id !== 'feral-image-viewport'
+        );
+        if (nonImgChildren.length === 0) {
+          return true;
         }
       }
     }
@@ -79,7 +91,12 @@
     if (document.images && document.images.length === 1) {
       const src = (document.images[0].src || '').toLowerCase();
       if (src.startsWith('data:image')) {
-        return true;
+        const nonImgChildren = Array.from(body.children).filter(
+          (el) => el.tagName !== 'IMG' && el.tagName !== 'SCRIPT' && el.tagName !== 'STYLE' && el.id !== 'feral-image-viewport'
+        );
+        if (nonImgChildren.length === 0) {
+          return true;
+        }
       }
     }
 
@@ -88,8 +105,11 @@
     const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.bmp', '.avif', '.ico'];
     const isImgUrl = imageExtensions.some((ext) => cleanUrl.endsWith(ext));
 
-    if (isImgUrl && body && document.querySelectorAll('img').length === 1) {
-      if (!body.innerText || body.innerText.trim() === '') {
+    if (isImgUrl && document.querySelectorAll('img').length === 1) {
+      const nonImgChildren = Array.from(body.children).filter(
+        (el) => el.tagName !== 'IMG' && el.tagName !== 'SCRIPT' && el.tagName !== 'STYLE' && el.id !== 'feral-image-viewport'
+      );
+      if (nonImgChildren.length === 0) {
         return true;
       }
     }
@@ -545,7 +565,15 @@
     const nonImgChildren = Array.from(body.children).filter(
       (el) => el.tagName !== 'IMG' && el.tagName !== 'SCRIPT' && el.tagName !== 'STYLE' && el.id !== 'feral-image-viewport'
     );
-    return nonImgChildren.length > 0;
+    if (nonImgChildren.length > 0) {
+      return true;
+    }
+
+    if (body.innerText && body.innerText.trim().length > 0) {
+      return true;
+    }
+
+    return false;
   }
 
   /**
@@ -556,23 +584,32 @@
     let observer = null;
     let pollTimer = null;
 
+    function stopMonitoring() {
+      if (observer) {
+        observer.disconnect();
+        observer = null;
+      }
+      if (pollTimer) {
+        clearInterval(pollTimer);
+        pollTimer = null;
+      }
+    }
+
     function attemptMount() {
       if (initialized) return;
       if (isStandaloneImage()) {
         if (setupViewer()) {
           initialized = true;
-          if (observer) observer.disconnect();
-          if (pollTimer) clearInterval(pollTimer);
+          stopMonitoring();
         }
       } else if (isDefinitelyRegularPage()) {
-        if (observer) observer.disconnect();
-        if (pollTimer) clearInterval(pollTimer);
+        stopMonitoring();
       }
     }
 
     // 1. Immediate attempt
     attemptMount();
-    if (initialized || isDefinitelyRegularPage()) return;
+    if (initialized) return;
 
     // 2. MutationObserver to catch <img> tag injection instantly
     observer = new MutationObserver(() => {
@@ -587,9 +624,8 @@
     const startTime = Date.now();
     pollTimer = setInterval(() => {
       attemptMount();
-      if (Date.now() - startTime > 3000) {
-        clearInterval(pollTimer);
-        if (observer) observer.disconnect();
+      if (initialized || Date.now() - startTime > 3000) {
+        stopMonitoring();
       }
     }, 30);
 

@@ -95,11 +95,13 @@ assert.strictEqual(dims.height, 300);
 console.log('✓ SVG dimension fallbacks verified!');
 
 // 4. Test isDefinitelyRegularPage early exit heuristic
-function isDefinitelyRegularPage(bodyChildren) {
+function isDefinitelyRegularPage(bodyChildren, innerText = '') {
   const nonImgChildren = bodyChildren.filter(
     (el) => el.tagName !== 'IMG' && el.tagName !== 'SCRIPT' && el.tagName !== 'STYLE' && el.id !== 'feral-image-viewport'
   );
-  return nonImgChildren.length > 0;
+  if (nonImgChildren.length > 0) return true;
+  if (innerText && innerText.trim().length > 0) return true;
+  return false;
 }
 
 console.log('Testing isDefinitelyRegularPage on standard HTML page body...');
@@ -111,7 +113,85 @@ const mockRegularBodyChildren = [
 assert.strictEqual(isDefinitelyRegularPage(mockRegularBodyChildren), true);
 console.log('✓ Regular web page early exit heuristic verified!');
 
-// 5. Test context menu handler logic
+console.log('Testing isDefinitelyRegularPage on Reddit CAPTCHA / Bot Challenge DOM...');
+const mockRedditCaptchaBody = [
+  { tagName: 'MAIN', children: [{ tagName: 'DIV', className: 'logo' }] },
+  { tagName: 'FORM', hidden: true }
+];
+assert.strictEqual(isDefinitelyRegularPage(mockRedditCaptchaBody), true);
+console.log('✓ Reddit CAPTCHA DOM correctly classified as regular page!');
+
+// 5. Test isStandaloneImage state logic simulation
+function simulateIsStandaloneImage(opts) {
+  const { href, protocol, contentType, readyState, bodyChildren, innerText, imgs } = opts;
+  const lowerHref = (href || '').toLowerCase();
+  const lowerProtocol = (protocol || '').toLowerCase();
+
+  // 1. Direct data:image URI check
+  if (lowerProtocol === 'data:' || lowerHref.startsWith('data:image')) {
+    return true;
+  }
+
+  // 2. ContentType check
+  if (contentType && contentType.toLowerCase().startsWith('image/')) {
+    return true;
+  }
+
+  // 3. Defer DOM heuristics during document loading for HTML pages
+  if (readyState === 'loading') {
+    return false;
+  }
+
+  if (innerText && innerText.trim().length > 0) {
+    return false;
+  }
+
+  if (imgs && imgs.length === 1) {
+    const nonImgChildren = (bodyChildren || []).filter(
+      (el) => el.tagName !== 'IMG' && el.tagName !== 'SCRIPT' && el.tagName !== 'STYLE' && el.id !== 'feral-image-viewport'
+    );
+    if (nonImgChildren.length === 0) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+console.log('Testing simulateIsStandaloneImage on Reddit URL during document loading...');
+const redditLoadingResult = simulateIsStandaloneImage({
+  href: 'https://www.reddit.com/r/retrogaming/comments/1knw1ml/the_story_behind_mad_catz_is_fascinating/',
+  protocol: 'https:',
+  contentType: 'text/html',
+  readyState: 'loading',
+  bodyChildren: [{ tagName: 'IMG', src: 'reddit_logo.png' }],
+  innerText: '',
+  imgs: [{ src: 'reddit_logo.png' }]
+});
+assert.strictEqual(redditLoadingResult, false);
+console.log('✓ Reddit URL during document loading correctly returned false (not triggered)!');
+
+console.log('Testing simulateIsStandaloneImage on direct data:image URI...');
+const dataUriResult = simulateIsStandaloneImage({
+  href: 'data:image/png;base64,iVBORw0KGgo...',
+  protocol: 'data:',
+  contentType: 'text/html',
+  readyState: 'loading'
+});
+assert.strictEqual(dataUriResult, true);
+console.log('✓ Data URI correctly returned true immediately!');
+
+console.log('Testing simulateIsStandaloneImage on Chrome native image tab (contentType image/jpeg)...');
+const chromeImageTabResult = simulateIsStandaloneImage({
+  href: 'https://example.com/photo.jpg',
+  protocol: 'https:',
+  contentType: 'image/jpeg',
+  readyState: 'loading'
+});
+assert.strictEqual(chromeImageTabResult, true);
+console.log('✓ Native image tab correctly returned true immediately!');
+
+// 6. Test context menu handler logic
 function handleContextMenuClick(info, tab, updateFn) {
   if (info && info.menuItemId === 'openImageInThisTab' && info.srcUrl && tab && tab.id) {
     updateFn(tab.id, { url: info.srcUrl });
@@ -140,4 +220,5 @@ assert.strictEqual(updatedUrl, 'https://example.com/photo.jpg');
 console.log('✓ Context menu click handler verified!');
 
 console.log('\nAll tests passed cleanly!');
+
 
